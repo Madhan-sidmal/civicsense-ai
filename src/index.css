@@ -9,27 +9,27 @@
 
 @layer base {
   :root {
-    /* Dark ops palette */
-    --background: 210 60% 6%;            /* #0d1b2a */
-    --foreground: 150 30% 92%;
+    /* Civic Hope palette — warm dark ops with hopeful mint */
+    --background: 200 45% 8%;            /* deep ocean indigo */
+    --foreground: 150 25% 94%;
 
-    --card: 210 50% 9%;
-    --card-foreground: 150 30% 94%;
+    --card: 200 38% 11%;
+    --card-foreground: 150 25% 96%;
 
-    --popover: 210 55% 8%;
-    --popover-foreground: 150 30% 94%;
+    --popover: 200 42% 10%;
+    --popover-foreground: 150 25% 96%;
 
-    --primary: 165 71% 50%;              /* neon mint #2dd4a8 */
-    --primary-foreground: 210 60% 6%;
+    --primary: 160 75% 52%;              /* hopeful mint */
+    --primary-foreground: 200 45% 8%;
 
-    --secondary: 155 56% 19%;            /* deep forest #1b4332 */
-    --secondary-foreground: 150 60% 90%;
+    --secondary: 155 50% 22%;            /* living forest */
+    --secondary-foreground: 150 60% 92%;
 
-    --muted: 210 35% 14%;
-    --muted-foreground: 200 15% 60%;
+    --muted: 200 28% 15%;
+    --muted-foreground: 195 15% 65%;
 
-    --accent: 150 100% 73%;              /* glow mint #73ffb8 */
-    --accent-foreground: 210 60% 6%;
+    --accent: 35 95% 65%;                /* warm civic gold — humanity */
+    --accent-foreground: 200 45% 8%;
 
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
@@ -49,19 +49,22 @@
 
     --radius: 0.75rem;
 
-    /* Gradients */
-    --gradient-hero: radial-gradient(ellipse at top, hsl(155 56% 19% / 0.6), transparent 60%),
-                     radial-gradient(ellipse at bottom right, hsl(165 71% 50% / 0.18), transparent 55%),
-                     linear-gradient(180deg, hsl(210 60% 6%), hsl(210 70% 4%));
-    --gradient-mint: linear-gradient(135deg, hsl(165 71% 50%), hsl(150 100% 73%));
-    --gradient-panel: linear-gradient(180deg, hsl(210 50% 10% / 0.9), hsl(210 55% 7% / 0.9));
-    --gradient-grid: linear-gradient(hsl(165 71% 50% / 0.06) 1px, transparent 1px),
-                     linear-gradient(90deg, hsl(165 71% 50% / 0.06) 1px, transparent 1px);
+    /* Gradients — hopeful, dawn-over-city feeling */
+    --gradient-hero: radial-gradient(ellipse at top left, hsl(160 75% 52% / 0.22), transparent 55%),
+                     radial-gradient(ellipse at top right, hsl(35 95% 65% / 0.14), transparent 55%),
+                     radial-gradient(ellipse at bottom, hsl(155 50% 22% / 0.5), transparent 65%),
+                     linear-gradient(180deg, hsl(200 45% 8%), hsl(200 55% 5%));
+    --gradient-mint: linear-gradient(135deg, hsl(160 75% 52%), hsl(150 100% 75%));
+    --gradient-warm: linear-gradient(135deg, hsl(160 75% 52%), hsl(35 95% 65%));
+    --gradient-panel: linear-gradient(180deg, hsl(200 38% 12% / 0.92), hsl(200 42% 9% / 0.92));
+    --gradient-grid: linear-gradient(hsl(160 75% 52% / 0.05) 1px, transparent 1px),
+                     linear-gradient(90deg, hsl(160 75% 52% / 0.05) 1px, transparent 1px);
 
     /* Shadows / glows */
-    --glow-mint: 0 0 0 1px hsl(165 71% 50% / 0.4), 0 0 30px hsl(165 71% 50% / 0.25);
-    --glow-soft: 0 10px 40px -10px hsl(165 71% 50% / 0.3);
-    --shadow-panel: 0 20px 60px -20px hsl(210 80% 2% / 0.8);
+    --glow-mint: 0 0 0 1px hsl(160 75% 52% / 0.4), 0 0 32px hsl(160 75% 52% / 0.28);
+    --glow-warm: 0 0 0 1px hsl(35 95% 65% / 0.35), 0 0 28px hsl(35 95% 65% / 0.22);
+    --glow-soft: 0 10px 40px -10px hsl(160 75% 52% / 0.35);
+    --shadow-panel: 0 20px 60px -20px hsl(200 80% 2% / 0.85);
 
     /* Motion */
     --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -78,33 +81,33 @@
   }
 
   .dark {
-    --background: 210 60% 6%;
-    --foreground: 150 30% 92%;
-    --card: 210 50% 9%;
-    --card-foreground: 150 30% 94%;
-    --popover: 210 55% 8%;
-    --popover-foreground: 150 30% 94%;
-    --primary: 165 71% 50%;
-    --primary-foreground: 210 60% 6%;
-    --secondary: 155 56% 19%;
-    --secondary-foreground: 150 60% 90%;
-    --muted: 210 35% 14%;
-    --muted-foreground: 200 15% 60%;
-    --accent: 150 100% 73%;
-    --accent-foreground: 210 60% 6%;
+    --background: 200 45% 8%;
+    --foreground: 150 25% 94%;
+    --card: 200 38% 11%;
+    --card-foreground: 150 25% 96%;
+    --popover: 200 42% 10%;
+    --popover-foreground: 150 25% 96%;
+    --primary: 160 75% 52%;
+    --primary-foreground: 200 45% 8%;
+    --secondary: 155 50% 22%;
+    --secondary-foreground: 150 60% 92%;
+    --muted: 200 28% 15%;
+    --muted-foreground: 195 15% 65%;
+    --accent: 35 95% 65%;
+    --accent-foreground: 200 45% 8%;
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 200 30% 18%;
-    --input: 200 30% 16%;
-    --ring: 165 71% 50%;
-    --sidebar-background: 210 60% 5%;
-    --sidebar-foreground: 150 25% 80%;
-    --sidebar-primary: 165 71% 50%;
-    --sidebar-primary-foreground: 210 60% 6%;
-    --sidebar-accent: 210 40% 12%;
-    --sidebar-accent-foreground: 150 60% 90%;
-    --sidebar-border: 200 30% 14%;
-    --sidebar-ring: 165 71% 50%;
+    --border: 195 28% 19%;
+    --input: 195 28% 17%;
+    --ring: 160 75% 52%;
+    --sidebar-background: 200 50% 6%;
+    --sidebar-foreground: 150 22% 82%;
+    --sidebar-primary: 160 75% 52%;
+    --sidebar-primary-foreground: 200 45% 8%;
+    --sidebar-accent: 200 38% 13%;
+    --sidebar-accent-foreground: 150 60% 92%;
+    --sidebar-border: 195 28% 15%;
+    --sidebar-ring: 160 75% 52%;
   }
 }
 
@@ -143,7 +146,18 @@
   }
 
   .text-glow {
-    text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+    text-shadow: 0 0 24px hsl(var(--primary) / 0.55);
+  }
+
+  .text-gradient-warm {
+    background-image: var(--gradient-warm);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .impact-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs text-primary;
   }
 
   .mono {
