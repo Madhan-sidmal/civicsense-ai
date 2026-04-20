@@ -5,8 +5,10 @@ import { UploadPanel } from "@/components/UploadPanel";
 import { PipelineLog } from "@/components/PipelineLog";
 import { ResultCard, ResultCardEmpty } from "@/components/ResultCard";
 import { ReportsDashboard } from "@/components/ReportsDashboard";
+import { ImpactBanner } from "@/components/ImpactBanner";
 import { PIPELINE_STEPS, pickScenario, type PipelineResult, type PipelineStep } from "@/lib/mockPipeline";
-import { Activity } from "lucide-react";
+import { Activity, Heart } from "lucide-react";
+import { toast } from "sonner";
 
 const SEED_REPORTS: PipelineResult[] = [
   {
@@ -123,6 +125,11 @@ const Index = () => {
       setActiveResult(result);
       setReports((prev) => [result, ...prev]);
       setIsProcessing(false);
+
+      toast.success("Thank you — your report is on its way!", {
+        description: `Routed to ${result.authority}. You're helping make ${result.location} better.`,
+        icon: <Heart className="h-4 w-4 text-accent" />,
+      });
     },
     [],
   );
@@ -156,13 +163,15 @@ const Index = () => {
           <section className="border-b border-border/60 bg-background/30">
             <div className="grid-bg">
               <div className="mx-auto max-w-6xl px-4 py-8 lg:py-10">
-                <div className="mono mb-2 text-[10px] tracking-widest text-primary">CIVIC INTELLIGENCE PIPELINE</div>
+                <div className="mono mb-2 text-[10px] tracking-widest text-primary">
+                  CIVIC INTELLIGENCE · BUILT FOR PEOPLE
+                </div>
                 <h2 className="font-display text-2xl font-semibold leading-tight md:text-3xl">
-                  Perception. Reasoning. <span className="text-primary text-glow">Automation.</span>
+                  Spot it. Snap it. <span className="text-gradient-warm">Solve it together.</span>
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                  Upload a civic issue. Google Vision detects, Gemini reasons, our engines score and route, and n8n
-                  dispatches the alert — all in seconds.
+                  Your report becomes a real action in seconds. Our AI sees, understands, and routes it to the
+                  right team — so the change you want to see actually happens.
                 </p>
               </div>
             </div>
@@ -170,6 +179,10 @@ const Index = () => {
 
           {/* Main grid */}
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 lg:py-8">
+            <div className="mb-6">
+              <ImpactBanner reportCount={reports.length} />
+            </div>
+
             <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
               <UploadPanel onSubmit={runPipeline} isProcessing={isProcessing} />
               <PipelineLog steps={steps} />
