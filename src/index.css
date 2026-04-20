@@ -9,105 +9,106 @@
 
 @layer base {
   :root {
-    /* Civic Hope palette — warm dark ops with hopeful mint */
-    --background: 200 45% 8%;            /* deep ocean indigo */
-    --foreground: 150 25% 94%;
+    /* Friendly Daylight palette — warm, approachable, calm */
+    --background: 36 38% 97%;            /* soft cream */
+    --foreground: 215 35% 18%;           /* deep navy ink */
 
-    --card: 200 38% 11%;
-    --card-foreground: 150 25% 96%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 35% 18%;
 
-    --popover: 200 42% 10%;
-    --popover-foreground: 150 25% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 35% 18%;
 
-    --primary: 160 75% 52%;              /* hopeful mint */
-    --primary-foreground: 200 45% 8%;
+    --primary: 178 60% 38%;              /* calm teal */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 155 50% 22%;            /* living forest */
-    --secondary-foreground: 150 60% 92%;
+    --secondary: 36 45% 92%;             /* warm sand */
+    --secondary-foreground: 215 35% 18%;
 
-    --muted: 200 28% 15%;
-    --muted-foreground: 195 15% 65%;
+    --muted: 36 30% 94%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 35 95% 65%;                /* warm civic gold — humanity */
-    --accent-foreground: 200 45% 8%;
+    --accent: 14 80% 62%;                /* warm coral */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 55%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning: 38 95% 58%;
-    --warning-foreground: 210 60% 6%;
+    --warning: 35 92% 55%;
+    --warning-foreground: 215 35% 18%;
 
-    --success: 150 70% 50%;
-    --success-foreground: 210 60% 6%;
+    --success: 152 55% 42%;
+    --success-foreground: 0 0% 100%;
 
-    --info: 200 90% 60%;
-    --info-foreground: 210 60% 6%;
+    --info: 200 75% 50%;
+    --info-foreground: 0 0% 100%;
 
-    --border: 200 30% 18%;
-    --input: 200 30% 16%;
-    --ring: 165 71% 50%;
+    --border: 36 25% 88%;
+    --input: 36 25% 90%;
+    --ring: 178 60% 38%;
 
-    --radius: 0.75rem;
+    --radius: 0.85rem;
 
-    /* Gradients — hopeful, dawn-over-city feeling */
-    --gradient-hero: radial-gradient(ellipse at top left, hsl(160 75% 52% / 0.22), transparent 55%),
-                     radial-gradient(ellipse at top right, hsl(35 95% 65% / 0.14), transparent 55%),
-                     radial-gradient(ellipse at bottom, hsl(155 50% 22% / 0.5), transparent 65%),
-                     linear-gradient(180deg, hsl(200 45% 8%), hsl(200 55% 5%));
-    --gradient-mint: linear-gradient(135deg, hsl(160 75% 52%), hsl(150 100% 75%));
-    --gradient-warm: linear-gradient(135deg, hsl(160 75% 52%), hsl(35 95% 65%));
-    --gradient-panel: linear-gradient(180deg, hsl(200 38% 12% / 0.92), hsl(200 42% 9% / 0.92));
-    --gradient-grid: linear-gradient(hsl(160 75% 52% / 0.05) 1px, transparent 1px),
-                     linear-gradient(90deg, hsl(160 75% 52% / 0.05) 1px, transparent 1px);
+    /* Gradients — soft sunrise-on-paper feel */
+    --gradient-hero: radial-gradient(ellipse at top left, hsl(178 60% 80% / 0.45), transparent 55%),
+                     radial-gradient(ellipse at top right, hsl(14 80% 80% / 0.35), transparent 55%),
+                     radial-gradient(ellipse at bottom, hsl(36 60% 92% / 0.7), transparent 65%),
+                     linear-gradient(180deg, hsl(36 38% 97%), hsl(36 45% 95%));
+    --gradient-mint: linear-gradient(135deg, hsl(178 60% 38%), hsl(165 55% 55%));
+    --gradient-warm: linear-gradient(135deg, hsl(178 60% 38%), hsl(14 80% 62%));
+    --gradient-panel: linear-gradient(180deg, hsl(0 0% 100% / 0.85), hsl(36 38% 97% / 0.85));
+    --gradient-grid: linear-gradient(hsl(178 60% 38% / 0.06) 1px, transparent 1px),
+                     linear-gradient(90deg, hsl(178 60% 38% / 0.06) 1px, transparent 1px);
 
-    /* Shadows / glows */
-    --glow-mint: 0 0 0 1px hsl(160 75% 52% / 0.4), 0 0 32px hsl(160 75% 52% / 0.28);
-    --glow-warm: 0 0 0 1px hsl(35 95% 65% / 0.35), 0 0 28px hsl(35 95% 65% / 0.22);
-    --glow-soft: 0 10px 40px -10px hsl(160 75% 52% / 0.35);
-    --shadow-panel: 0 20px 60px -20px hsl(200 80% 2% / 0.85);
+    /* Shadows / glows — soft and friendly */
+    --glow-mint: 0 0 0 1px hsl(178 60% 38% / 0.25), 0 8px 30px hsl(178 60% 38% / 0.18);
+    --glow-warm: 0 0 0 1px hsl(14 80% 62% / 0.3), 0 8px 28px hsl(14 80% 62% / 0.22);
+    --glow-soft: 0 12px 40px -12px hsl(178 60% 38% / 0.3);
+    --shadow-panel: 0 12px 40px -16px hsl(215 35% 18% / 0.18), 0 2px 6px hsl(215 35% 18% / 0.04);
 
     /* Motion */
     --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
     /* Sidebar */
-    --sidebar-background: 210 60% 5%;
-    --sidebar-foreground: 150 25% 80%;
-    --sidebar-primary: 165 71% 50%;
-    --sidebar-primary-foreground: 210 60% 6%;
-    --sidebar-accent: 210 40% 12%;
-    --sidebar-accent-foreground: 150 60% 90%;
-    --sidebar-border: 200 30% 14%;
-    --sidebar-ring: 165 71% 50%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 30% 28%;
+    --sidebar-primary: 178 60% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 36 45% 94%;
+    --sidebar-accent-foreground: 215 35% 18%;
+    --sidebar-border: 36 25% 88%;
+    --sidebar-ring: 178 60% 38%;
   }
 
   .dark {
-    --background: 200 45% 8%;
-    --foreground: 150 25% 94%;
-    --card: 200 38% 11%;
-    --card-foreground: 150 25% 96%;
-    --popover: 200 42% 10%;
-    --popover-foreground: 150 25% 96%;
-    --primary: 160 75% 52%;
-    --primary-foreground: 200 45% 8%;
-    --secondary: 155 50% 22%;
-    --secondary-foreground: 150 60% 92%;
-    --muted: 200 28% 15%;
-    --muted-foreground: 195 15% 65%;
-    --accent: 35 95% 65%;
-    --accent-foreground: 200 45% 8%;
-    --destructive: 0 75% 55%;
+    /* Keep a cozy dark fallback */
+    --background: 215 35% 10%;
+    --foreground: 36 30% 94%;
+    --card: 215 32% 13%;
+    --card-foreground: 36 30% 96%;
+    --popover: 215 32% 13%;
+    --popover-foreground: 36 30% 96%;
+    --primary: 178 65% 50%;
+    --primary-foreground: 215 35% 10%;
+    --secondary: 215 25% 20%;
+    --secondary-foreground: 36 30% 94%;
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 15% 65%;
+    --accent: 14 80% 65%;
+    --accent-foreground: 215 35% 10%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 195 28% 19%;
-    --input: 195 28% 17%;
-    --ring: 160 75% 52%;
-    --sidebar-background: 200 50% 6%;
-    --sidebar-foreground: 150 22% 82%;
-    --sidebar-primary: 160 75% 52%;
-    --sidebar-primary-foreground: 200 45% 8%;
-    --sidebar-accent: 200 38% 13%;
-    --sidebar-accent-foreground: 150 60% 92%;
-    --sidebar-border: 195 28% 15%;
-    --sidebar-ring: 160 75% 52%;
+    --border: 215 20% 22%;
+    --input: 215 20% 20%;
+    --ring: 178 65% 50%;
+    --sidebar-background: 215 35% 8%;
+    --sidebar-foreground: 36 25% 85%;
+    --sidebar-primary: 178 65% 50%;
+    --sidebar-primary-foreground: 215 35% 10%;
+    --sidebar-accent: 215 25% 16%;
+    --sidebar-accent-foreground: 36 30% 94%;
+    --sidebar-border: 215 20% 18%;
+    --sidebar-ring: 178 65% 50%;
   }
 }
 
@@ -117,7 +118,7 @@
   }
 
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
