@@ -10,56 +10,7 @@ import { PIPELINE_STEPS, pickScenario, type PipelineResult, type PipelineStep } 
 import { Activity, Heart } from "lucide-react";
 import { toast } from "sonner";
 
-const SEED_REPORTS: PipelineResult[] = [
-  {
-    id: "rep_a1b2c3",
-    createdAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-    imagePreview:
-      "data:image/svg+xml;utf8," +
-      encodeURIComponent(
-        `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='hsl(155 56% 19%)'/><text x='50' y='55' font-family='monospace' font-size='10' fill='hsl(165 71% 50%)' text-anchor='middle'>WASTE</text></svg>`,
-      ),
-    location: "MG Road, Sector 14",
-    labels: ["garbage", "plastic", "overflow"],
-    explanation: "Bin overflow detected near transit hub.",
-    severity: "HIGH",
-    priority: "CRITICAL",
-    authority: "Municipal Waste Department",
-    notifications: { email: true, sheets: true, messaging: true },
-  },
-  {
-    id: "rep_d4e5f6",
-    createdAt: new Date(Date.now() - 1000 * 60 * 47).toISOString(),
-    imagePreview:
-      "data:image/svg+xml;utf8," +
-      encodeURIComponent(
-        `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='hsl(210 50% 9%)'/><text x='50' y='55' font-family='monospace' font-size='10' fill='hsl(38 95% 58%)' text-anchor='middle'>POTHOLE</text></svg>`,
-      ),
-    location: "Ring Road, KM 4.2",
-    labels: ["pothole", "road damage"],
-    explanation: "Mid-size pothole on primary route.",
-    severity: "MEDIUM",
-    priority: "NORMAL",
-    authority: "Public Works (Roads)",
-    notifications: { email: true, sheets: true, messaging: false },
-  },
-  {
-    id: "rep_g7h8i9",
-    createdAt: new Date(Date.now() - 1000 * 60 * 130).toISOString(),
-    imagePreview:
-      "data:image/svg+xml;utf8," +
-      encodeURIComponent(
-        `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='hsl(210 60% 6%)'/><text x='50' y='55' font-family='monospace' font-size='8' fill='hsl(150 70% 50%)' text-anchor='middle'>STREET LIGHT</text></svg>`,
-      ),
-    location: "Park Lane 22",
-    labels: ["street light", "outage"],
-    explanation: "Single street light non-functional.",
-    severity: "LOW",
-    priority: "NORMAL",
-    authority: "Electrical Maintenance Division",
-    notifications: { email: true, sheets: true, messaging: false },
-  },
-];
+const BASE_URL = "http://127.0.0.1:8000";
 
 const Index = () => {
   const [steps, setSteps] = useState<PipelineStep[]>(
@@ -67,7 +18,7 @@ const Index = () => {
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeResult, setActiveResult] = useState<PipelineResult | null>(null);
-  const [reports, setReports] = useState<PipelineResult[]>(SEED_REPORTS);
+  const [reports, setReports] = useState<PipelineResult[]>([]);
 
   // SEO
   useEffect(() => {
@@ -82,6 +33,34 @@ const Index = () => {
     if (!meta.parentNode) document.head.appendChild(meta);
   }, []);
 
+  // Fetch reports on load
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/api/reports`);
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const mapped: PipelineResult[] = data.map((d: any) => ({
+          id: `rep_${d.id}`,
+          createdAt: d.timestamp,
+          imagePreview: `${BASE_URL}/${d.image_path}`,
+          location: d.latitude ? `${d.latitude}, ${d.longitude}` : "Unknown Location",
+          labels: typeof d.labels === "string" ? JSON.parse(d.labels) : d.labels,
+          explanation: d.explanation,
+          severity: d.severity,
+          priority: d.priority,
+          authority: d.authority,
+          notifications: { email: true, sheets: true, messaging: d.severity === "HIGH" },
+        }));
+        setReports(mapped);
+      } catch (err) {
+        console.error("Failed to fetch reports:", err);
+      }
+    };
+    fetchReports();
+  }, []);
+
   const runPipeline = useCallback(
     async (data: { file: File; preview: string; location: string }) => {
       setIsProcessing(true);
@@ -90,46 +69,73 @@ const Index = () => {
       const fresh: PipelineStep[] = PIPELINE_STEPS.map((s) => ({ ...s, status: "pending" }));
       setSteps(fresh);
 
-      const scenario = pickScenario(data.file.name + data.location);
-      const id = "rep_" + Math.random().toString(36).slice(2, 10);
+      // We will parse location as lat, lng if possible (mocked if not found)
+      let lat = "34.0522";
+      let lng = "-118.2437";
 
-      const stepDetails: Record<string, string> = {
-        upload: `POST /api/report · ${(data.file.size / 1024).toFixed(1)}KB · @${data.location}`,
-        vision: `labels = [${scenario.labels.slice(0, 3).map((l) => `"${l}"`).join(", ")}…]`,
-        gemini: scenario.explanation.slice(0, 90) + "…",
-        risk: `severity = ${scenario.severity}`,
-        priority: `priority = ${scenario.priority}`,
-        routing: `authority = ${scenario.authority}`,
-        n8n: `webhook → gmail ✓ sheets ✓ ${scenario.notifications.messaging ? "telegram ✓" : ""}`,
-      };
+      try {
+        const formData = new FormData();
+        formData.append("image", data.file);
+        formData.append("latitude", lat);
+        formData.append("longitude", lng);
 
-      for (let i = 0; i < fresh.length; i++) {
-        await new Promise((r) => setTimeout(r, 250));
-        setSteps((prev) => prev.map((s, idx) => (idx === i ? { ...s, status: "running" } : s)));
-        const dur = 400 + Math.floor(Math.random() * 700);
-        await new Promise((r) => setTimeout(r, dur));
-        setSteps((prev) =>
-          prev.map((s, idx) =>
-            idx === i ? { ...s, status: "done", durationMs: dur, detail: stepDetails[s.id] } : s,
-          ),
-        );
+        const res = await fetch(`${BASE_URL}/api/report`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) throw new Error("Failed to process report");
+        const scenario = await res.json();
+
+        const stepDetails: Record<string, string> = {
+          upload: `POST /api/report · ${(data.file.size / 1024).toFixed(1)}KB · @${data.location}`,
+          vision: `labels = [${scenario.labels.slice(0, 3).map((l: string) => `"${l}"`).join(", ")}…]`,
+          gemini: scenario.explanation.slice(0, 90) + "…",
+          risk: `severity = ${scenario.severity}`,
+          priority: `priority = ${scenario.priority}`,
+          routing: `authority = ${scenario.authority}`,
+          n8n: `webhook → gmail ✓ sheets ✓ ${scenario.severity === "HIGH" ? "telegram ✓" : ""}`,
+        };
+
+        // Animate UI steps identically
+        for (let i = 0; i < fresh.length; i++) {
+          await new Promise((r) => setTimeout(r, 150));
+          setSteps((prev) => prev.map((s, idx) => (idx === i ? { ...s, status: "running" } : s)));
+          const dur = 200 + Math.floor(Math.random() * 400);
+          await new Promise((r) => setTimeout(r, dur));
+          setSteps((prev) =>
+            prev.map((s, idx) =>
+              idx === i ? { ...s, status: "done", durationMs: dur, detail: stepDetails[s.id] } : s,
+            ),
+          );
+        }
+
+        const result: PipelineResult = {
+          id: `rep_${scenario.id}`,
+          createdAt: new Date().toISOString(),
+          imagePreview: `${BASE_URL}${scenario.image_url}`,
+          location: data.location,
+          labels: scenario.labels,
+          explanation: scenario.explanation,
+          severity: scenario.severity,
+          priority: scenario.priority,
+          authority: scenario.authority,
+          notifications: { email: true, sheets: true, messaging: scenario.severity === "HIGH" },
+        };
+        
+        setActiveResult(result);
+        setReports((prev) => [result, ...prev]);
+        setIsProcessing(false);
+
+        toast.success("Thank you — your report is on its way!", {
+          description: `Routed to ${result.authority}. You're helping make ${result.location} better.`,
+          icon: <Heart className="h-4 w-4 text-accent" />,
+        });
+      } catch (err) {
+        console.error(err);
+        toast.error("Pipeline failed.");
+        setIsProcessing(false);
       }
-
-      const result: PipelineResult = {
-        id,
-        createdAt: new Date().toISOString(),
-        imagePreview: data.preview,
-        location: data.location,
-        ...scenario,
-      };
-      setActiveResult(result);
-      setReports((prev) => [result, ...prev]);
-      setIsProcessing(false);
-
-      toast.success("Thank you — your report is on its way!", {
-        description: `Routed to ${result.authority}. You're helping make ${result.location} better.`,
-        icon: <Heart className="h-4 w-4 text-accent" />,
-      });
     },
     [],
   );
