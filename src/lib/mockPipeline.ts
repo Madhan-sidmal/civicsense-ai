@@ -15,6 +15,7 @@ export interface PipelineStep {
 
 export interface PipelineResult {
   id: string;
+  userId?: number;
   createdAt: string;
   imagePreview: string;
   location: string;
@@ -23,6 +24,7 @@ export interface PipelineResult {
   severity: Severity;
   priority: Priority;
   authority: string;
+  upvotes: number;
   notifications: { email: boolean; sheets: boolean; messaging: boolean };
 }
 

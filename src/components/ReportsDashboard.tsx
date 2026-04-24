@@ -109,8 +109,13 @@ export function ReportsDashboard({ reports, onSelect }: Props) {
                   onClick={() => onSelect(r)}
                   className="group cursor-pointer rounded-lg bg-muted/20 transition hover:bg-primary/5"
                 >
-                  <td className="rounded-l-md px-3 py-3 mono text-[11px] text-primary">
+                  <td className="rounded-l-md px-3 py-3 mono text-[11px] text-primary flex items-center gap-2">
                     #{r.id.slice(0, 6).toUpperCase()}
+                    {r.upvotes > 1 && (
+                      <span className="inline-flex items-center gap-1 rounded bg-orange-500/10 px-1.5 py-0.5 text-[10px] font-medium text-orange-500">
+                        🔥 {r.upvotes}
+                      </span>
+                    )}
                   </td>
                   <td className="px-3 py-3">
                     <span className="mono inline-flex items-center gap-1.5 text-[11px]">

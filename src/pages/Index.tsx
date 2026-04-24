@@ -5,20 +5,32 @@ import { UploadPanel } from "@/components/UploadPanel";
 import { PipelineLog } from "@/components/PipelineLog";
 import { ResultCard, ResultCardEmpty } from "@/components/ResultCard";
 import { ReportsDashboard } from "@/components/ReportsDashboard";
+import { MapDashboard } from "@/components/MapDashboard";
 import { ImpactBanner } from "@/components/ImpactBanner";
 import { PIPELINE_STEPS, pickScenario, type PipelineResult, type PipelineStep } from "@/lib/mockPipeline";
-import { Activity, Heart } from "lucide-react";
+import { Activity, Heart, LogOut, Map as MapIcon, List as ListIcon } from "lucide-react";
 import { toast } from "sonner";
+import { AuthDialog } from "@/components/AuthDialog";
+import { useAuth } from "@/lib/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const BASE_URL = "http://127.0.0.1:8000";
 
+// Fallback logic if geolocation is denied
+const DEFAULT_LAT = 34.0522;
+const DEFAULT_LNG = -118.2437;
+const getRandomJitter = () => (Math.random() - 0.5) * 0.05; // rough ~2 mile scatter
+
 const Index = () => {
+  const { token, userId, isAuthenticated, logout } = useAuth();
   const [steps, setSteps] = useState<PipelineStep[]>(
     PIPELINE_STEPS.map((s) => ({ ...s, status: "pending" })),
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeResult, setActiveResult] = useState<PipelineResult | null>(null);
   const [reports, setReports] = useState<PipelineResult[]>([]);
+  const [filterMine, setFilterMine] = useState(false);
 
   // SEO
   useEffect(() => {
@@ -43,6 +55,7 @@ const Index = () => {
         
         const mapped: PipelineResult[] = data.map((d: any) => ({
           id: `rep_${d.id}`,
+          userId: d.user_id,
           createdAt: d.timestamp,
           imagePreview: `${BASE_URL}/${d.image_path}`,
           location: d.latitude ? `${d.latitude}, ${d.longitude}` : "Unknown Location",
@@ -51,6 +64,7 @@ const Index = () => {
           severity: d.severity,
           priority: d.priority,
           authority: d.authority,
+          upvotes: d.upvotes,
           notifications: { email: true, sheets: true, messaging: d.severity === "HIGH" },
         }));
         setReports(mapped);
@@ -69,9 +83,23 @@ const Index = () => {
       const fresh: PipelineStep[] = PIPELINE_STEPS.map((s) => ({ ...s, status: "pending" }));
       setSteps(fresh);
 
-      // We will parse location as lat, lng if possible (mocked if not found)
-      let lat = "34.0522";
-      let lng = "-118.2437";
+      // Get location (Dynamic GPS or Jittered Default)
+      let lat = String(DEFAULT_LAT + getRandomJitter());
+      let lng = String(DEFAULT_LNG + getRandomJitter());
+      let locString = "Unknown Location";
+
+      try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 });
+        });
+        lat = String(pos.coords.latitude);
+        lng = String(pos.coords.longitude);
+        locString = `${lat.slice(0,7)}, ${lng.slice(0,8)}`;
+      } catch (e) {
+        // User denied or timeout, use jittered default
+        locString = `${lat.slice(0,7)}, ${lng.slice(0,8)} (Estimated)`;
+        console.log("Geolocation fallback used");
+      }
 
       try {
         const formData = new FormData();
@@ -79,8 +107,14 @@ const Index = () => {
         formData.append("latitude", lat);
         formData.append("longitude", lng);
 
+        const headers: HeadersInit = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const res = await fetch(`${BASE_URL}/api/report`, {
           method: "POST",
+          headers,
           body: formData,
         });
 
@@ -88,7 +122,7 @@ const Index = () => {
         const scenario = await res.json();
 
         const stepDetails: Record<string, string> = {
-          upload: `POST /api/report · ${(data.file.size / 1024).toFixed(1)}KB · @${data.location}`,
+          upload: `POST /api/report · ${(data.file.size / 1024).toFixed(1)}KB · @${locString}`,
           vision: `labels = [${scenario.labels.slice(0, 3).map((l: string) => `"${l}"`).join(", ")}…]`,
           gemini: scenario.explanation.slice(0, 90) + "…",
           risk: `severity = ${scenario.severity}`,
@@ -112,19 +146,31 @@ const Index = () => {
 
         const result: PipelineResult = {
           id: `rep_${scenario.id}`,
+          userId: scenario.user_id,
           createdAt: new Date().toISOString(),
           imagePreview: `${BASE_URL}${scenario.image_url}`,
-          location: data.location,
+          location: locString,
           labels: scenario.labels,
           explanation: scenario.explanation,
           severity: scenario.severity,
           priority: scenario.priority,
           authority: scenario.authority,
+          upvotes: scenario.upvotes,
           notifications: { email: true, sheets: true, messaging: scenario.severity === "HIGH" },
         };
         
         setActiveResult(result);
-        setReports((prev) => [result, ...prev]);
+        
+        setReports((prev) => {
+          const existingIdx = prev.findIndex(r => r.id === result.id);
+          if (existingIdx >= 0) {
+            const next = [...prev];
+            next[existingIdx] = result;
+            return next;
+          }
+          return [result, ...prev];
+        });
+        
         setIsProcessing(false);
 
         toast.success("Thank you — your report is on its way!", {
@@ -137,8 +183,10 @@ const Index = () => {
         setIsProcessing(false);
       }
     },
-    [],
+    [token],
   );
+
+  const displayedReports = filterMine ? reports.filter(r => r.userId === userId) : reports;
 
   return (
     <SidebarProvider>
@@ -160,8 +208,26 @@ const Index = () => {
               </span>
               <span className="mono inline-flex items-center gap-1.5 rounded-md border border-success/40 bg-success/10 px-2 py-1 text-[10px] tracking-wider text-success">
                 <span className="status-dot bg-success text-success animate-pulse-glow" />
-                ALL SYSTEMS OPERATIONAL
+                OPERATIONAL
               </span>
+              <div className="w-px h-4 bg-border mx-1"></div>
+              {isAuthenticated ? (
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant={filterMine ? "default" : "secondary"} 
+                    size="sm" 
+                    onClick={() => setFilterMine(!filterMine)}
+                  >
+                    {filterMine ? "Showing My Reports" : "My Reports"}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={logout} className="gap-2 text-muted-foreground hover:text-foreground">
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <AuthDialog />
+              )}
             </div>
           </header>
 
@@ -186,7 +252,7 @@ const Index = () => {
           {/* Main grid */}
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 lg:py-8">
             <div className="mb-6">
-              <ImpactBanner reportCount={reports.length} />
+              <ImpactBanner reportCount={displayedReports.length} />
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
@@ -199,7 +265,25 @@ const Index = () => {
             </div>
 
             <div className="mt-6">
-              <ReportsDashboard reports={reports} onSelect={setActiveResult} />
+              <Tabs defaultValue="map" className="w-full">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-display text-lg font-semibold">Live Data</h3>
+                  <TabsList className="bg-muted/50 border border-border/40">
+                    <TabsTrigger value="map" className="gap-2 text-xs h-7 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
+                      <MapIcon className="w-3 h-3" /> Map View
+                    </TabsTrigger>
+                    <TabsTrigger value="list" className="gap-2 text-xs h-7 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
+                      <ListIcon className="w-3 h-3" /> List View
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                <TabsContent value="map" className="m-0 border border-border/60 rounded-lg overflow-hidden">
+                  <MapDashboard reports={displayedReports} onSelect={setActiveResult} />
+                </TabsContent>
+                <TabsContent value="list" className="m-0">
+                  <ReportsDashboard reports={displayedReports} onSelect={setActiveResult} />
+                </TabsContent>
+              </Tabs>
             </div>
 
             <footer className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-5 text-xs text-muted-foreground">

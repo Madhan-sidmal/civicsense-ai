@@ -49,6 +49,11 @@ export function ResultCard({ result }: Props) {
             >
               {result.priority}
             </span>
+            {result.upvotes > 1 && (
+              <span className="mono inline-flex items-center gap-1.5 rounded-md border border-orange-500/40 bg-orange-500/15 px-2 py-0.5 text-[11px] font-medium tracking-wider text-orange-500">
+                🔥 {result.upvotes} CITIZENS REPORTED THIS
+              </span>
+            )}
             <span className="mono ml-auto inline-flex items-center gap-1 text-[11px] text-muted-foreground">
               <MapPin className="h-3 w-3" /> {result.location}
             </span>
